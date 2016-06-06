@@ -1,149 +1,176 @@
 <!doctype html>
 <html ng-app="taskManagerApp">
-  <head>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
-    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.3.3.js"></script>
-    <script src="example.js"></script>
-    <script src="../js/angular-ui-notification.js"></script>
-    <link href='../css/style.css' rel="stylesheet" type="text/css" />
-    <link href='../css/css/font-awesome.css' rel="stylesheet" type="text/css" />
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-  </head>
-  <body>
+     <head>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.3.3.js"></script>
+        <script src="example.js"></script>
+        <script src="../js/angular-ui-notification.js"></script>
+        <link href='../css/style.css' rel="stylesheet" type="text/css" />
+        <link href='../css/css/font-awesome.css' rel="stylesheet" type="text/css" />
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div ng-controller="taskManagerController" class="container">
+              <div class="header clearfix">
+                <nav>
+                  <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#">Home</a></li>
+                    <li role="presentation"><a href="#">Demo</a></li>
+                    <li role="presentation"><a href="#">Info</a></li>
+                  </ul>
+                </nav>
+                <h3 class="text-muted">TaskManager</h3>
+              </div>
 
-<div ng-controller="taskManagerController">
-<h2 class="page-title">Task Manager using Spring Boot, Spring Data REST &amp; AngularJS</h2>
-<h4 class="page-title">Demo &amp; Tutorial by <a href="">Priyadarshini</a></h4>
-<a href="http://www.programming-free.com/2014/07/spring-data-rest-with-angularjs-crud.html" class="button-red" style="text-align:center;width:70px;margin-left:45%;margin-right:40%">Tutorial</a>   
-
-    <div id="task-panel" class="fadein fadeout showpanel panel" ng-show="toggle">   
-      
-            <div class="panel-heading">
-                <i class="panel-title-icon fa fa-tasks"></i>
-                <span class="panel-title">Recent Tasks</span>
-                <div class="panel-heading-controls">
-                    <button ng-click="toggle = !toggle" class="btn-panel">Add New Task</button>
-                    <button class="btn-panel" confirmed-click="archiveTasks()" ng-confirm-click="Would you like to archive completed tasks?">Clear completed tasks</button>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="task" ng-repeat="task in tasks">
-                    <div ng-click="open(task.taskName)"> 
-                        <span ng-if="task.taskPriority=='HIGH'" class="priority priority-red">
-                            <img src="../images/redlight.png">
-                        </span>
-                        <span ng-if="task.taskPriority=='MEDIUM'" class="priority priority-yellow">
-                            <img src="../images/yellowlight.png">
-                        </span>
-                        <span ng-if="task.taskPriority=='LOW'" class="priority priority-green">
-                            <img src="../images/greenlight.png">
-                        </span>
-                        <div class="action-checkbox">
-                            <input id="{{task._links.self.href}}" type="checkbox" value="{{task._links.self.href}}" ng-checked="selection.indexOf(task._links.self.href) > -1" ng-click="toggleSelection(task._links.self.href)" />
-                            <label for="{{task._links.self.href}}" ></label>
+              <!--<div class="jumbotron">
+                <h1>Demo TaskManager</h1>
+                <p class="lead">Proyecto de TaskManager hecho con el framework de springboot y angularjs</p>
+              </div>!-->
+            <div id="task-panel" class="fadein fadeout showpanel panel" ng-show="toggle">   
+              
+                    <div class="panel-heading">
+                        <i class="panel-title-icon fa fa-tasks"></i>
+                        <span class="panel-title">Recent Tasks</span>
+                        <div class="panel-heading-controls">
+                            <button ng-click="toggle = !toggle" class="btn-panel">Add New Task</button>
+                            <button class="btn-panel" confirmed-click="archiveTasks()" ng-confirm-click="Would you like to archive completed tasks?">Clear completed tasks</button>
                         </div>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                              <th/>
+                            <th>Task</th>
+                            <th>Priority</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="task in tasks">
 
-                            <div ng-if="task.taskStatus=='COMPLETED'">
-                                <a href="#" class="checkedClass">
-                                    {{task.taskName}}
-                                <span class="action-status">{{task.taskStatus}}</span>
-                                </a>
-                            </div>
-                            <div ng-if="task.taskStatus=='ACTIVE'">             
-                                <a href="#" class="uncheckedClass">
-                                    {{task.taskName}}
-                                    <span class="action-status">{{task.taskStatus}}</span>
-                                </a>
-                            </div>
+                                    <td>
+                                        <input id="{{task._links.self.href}}" type="checkbox" value="{{task._links.self.href}}" ng-checked="selection.indexOf(task._links.self.href) > -1" ng-click="toggleSelection(task._links.self.href)" />
+                                        <label for="{{task._links.self.href}}" ></label>
+                                    </td>
 
-                        <script type="text/ng-template" id="myModalContent.html">
-                            <div class="modal-header">
-                                <h3 class="modal-title">{{taskName}}</h3>
-                            </div>
-                            <div class="modal-body">
-                            <!--<p>
-                                <label for="namearea">Name: </label>
-                                <input id="namearea" type="text" ng-model="taskName"/>
-                            </p>
-                            <p> 
-                                <label for="textarea">Description: </label>
-                                <textarea id="textarea">Description here</textarea>
-                            </p>!-->
-                            <table border="0">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <label for="namearea">Name: </label>
-                                        </td>
-                                        <td>
-                                            <input id="namearea" type="text" ng-model="taskName"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label for="textarea">Description: </label>
-                                        </td>
-                                        <td>
-                                            <textarea id="textarea">Description Here </textarea>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-primary" type="button" ng-click="ok()">Update</button>
-                                <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-                            </div>
-                        </script>
+                                    <td  ng-click="open(task.taskName)">
+                                    <span ng-if="task.taskStatus=='COMPLETED'">
+                                            <a href="#" class="checkedClass">
+                                                {{task.taskName}}
+                                                <span class="action-status">{{task.taskStatus}}</span>
+                                            </a>
+                                        </span>
+                                        <span ng-if="task.taskStatus=='ACTIVE'">             
+                                            <a href="#" class="uncheckedClass">
+                                                {{task.taskName}}
+                                                <span class="action-status">{{task.taskStatus}}</span>
+                                            </a>
+                                        </span>
+                                    </td>
+
+                                    <td ng-click="open(task.taskName)">
+                                        <span ng-if="task.taskPriority=='HIGH'" class="priority priority-red">
+                                            <img src="../images/redlight.png">
+                                        </span>
+                                        <span ng-if="task.taskPriority=='MEDIUM'" class="priority priority-yellow">
+                                            <img src="../images/yellowlight.png">
+                                        </span>
+                                        <span ng-if="task.taskPriority=='LOW'" class="priority priority-green">
+                                            <img src="../images/greenlight.png">
+                                        </span>
+                                    </td>
+
+                                    <script type="text/ng-template" id="myModalContent.html">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title">{{taskName}}</h3>
+                                        </div>
+                                        <div class="modal-body">
+                                        <!--<p>
+                                                <label for="namearea">Name: </label>
+                                                <input id="namearea" type="text" ng-model="taskName"/>
+                                            </p>
+                                            <p> 
+                                                <label for="textarea">Description: </label>
+                                                <textarea id="textarea">Description here</textarea>
+                                            </p>!-->
+                                            <table border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <label for="namearea">Name: </label>
+                                                        </td>
+                                                        <td>
+                                                            <input id="namearea" type="text" ng-model="taskName"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label for="textarea">Description: </label>
+                                                        </td>
+                                                        <td>
+                                                            <textarea id="textarea">Description Here </textarea>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-primary" type="button" ng-click="ok()">Update</button>
+                                            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+                                        </div>
+                                    </script>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+            </div>
+            <div id="add-task-panel" class="fadein fadeout addpanel panel" ng-hide="toggle">
+                <div class="panel-heading">
+                    <i class="panel-title-icon fa fa-plus"></i>
+                    <span class="panel-title">Add Task</span>
+                    <div class="panel-heading-controls">
+                        <button ng-click="toggle = !toggle" class="btn-panel fadein">Show All Tasks</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="task" >
+                        <table class="add-task">
+                            <tr>
+                                <td>Task Name:</td>
+                                <td><input type="text" ng-model="taskName"/></td>
+                            </tr>
+                            <tr>
+                                <td>Task Description:</td>
+                                <td><input type="text" ng-model="taskDesc"/></td>
+                            </tr>
+                            <tr>
+                                <td>Task Status:</td>
+                                <td>
+                                    <select ng-model="taskStatus" ng-options="status as status for status in statuses">
+                                        <option value="">-- Select --</option>                      
+                                        </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Task Priority:</td>
+                                <td>
+                                    <select ng-model="taskPriority" ng-options="priority as priority for priority in priorities">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><br/><button ng-click="addTask()" class="btn-panel-big">Add New Task</button></td>
+                            </tr>
+                        </table>                                
                     </div>
                 </div>
             </div>
-
-    </div>
-    <div id="add-task-panel" class="fadein fadeout addpanel panel" ng-hide="toggle">
-        <div class="panel-heading">
-            <i class="panel-title-icon fa fa-plus"></i>
-            <span class="panel-title">Add Task</span>
-            <div class="panel-heading-controls">
-                <button ng-click="toggle = !toggle" class="btn-panel fadein">Show All Tasks</button>
-            </div>
+                <footer class="footer">
+                <p>&copy; 2016 Softtek</p>
+                </footer>
         </div>
-        <div class="panel-body">
-            <div class="task" >
-                <table class="add-task">
-                    <tr>
-                        <td>Task Name:</td>
-                        <td><input type="text" ng-model="taskName"/></td>
-                    </tr>
-                    <tr>
-                        <td>Task Description:</td>
-                        <td><input type="text" ng-model="taskDesc"/></td>
-                    </tr>
-                    <tr>
-                        <td>Task Status:</td>
-                        <td>
-                            <select ng-model="taskStatus" ng-options="status as status for status in statuses">
-                                <option value="">-- Select --</option>                      
-                                </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Task Priority:</td>
-                        <td>
-                            <select ng-model="taskPriority" ng-options="priority as priority for priority in priorities">
-                                <option value="">-- Select --</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><br/><button ng-click="addTask()" class="btn-panel-big">Add New Task</button></td>
-                    </tr>
-                </table>                                
-            </div>
-        </div>
-    </div>
-</div>
-
-  </body>
+    </body>
 </html>

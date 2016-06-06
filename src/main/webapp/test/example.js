@@ -159,7 +159,7 @@ angular.module('taskManagerApp').controller('taskManagerController', function ($
       animation: $scope.animationsEnabled,
       templateUrl: 'myModalContent.html',
       controller: 'ModalInstanceCtrl',
-
+      
       resolve: {
         taskName: function () {
           return taskName;
