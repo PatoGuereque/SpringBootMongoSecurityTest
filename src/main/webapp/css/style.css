@@ -8,7 +8,6 @@
     
 body
 {
-	width:80%;
 	margin-left:auto;
 	margin-right:auto;
 	font-family: 'Open Sans', sans-serif;
@@ -142,17 +141,17 @@ body
 .priority-red
 {
 	color: #fff;
-	background: maroon;
+	/*background: maroon;*/
 }
 .priority-yellow
 {
 	color: #fff;
-	background: #f4b04f;
+	/*background: #f4b04f;*/
 }
 .priority-green
 {
 	color: #fff;
-	background: green;
+	/*background: green;*/
 }
 
 .task .action-checkbox
@@ -361,4 +360,8 @@ input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow sp
 .ui-notification.info {
     color: #fff;
     background: #5bc0de
+}
+
+#textarea {
+	vertical-align: top;
 }
