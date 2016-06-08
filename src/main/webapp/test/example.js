@@ -35,12 +35,20 @@ angular.module('taskManagerApp', ['ngAnimate', 'ui.bootstrap', 'ui-notification'
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-angular.module('taskManagerApp').controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, taskName) {
-
-  $scope.taskName = taskName;
-  $scope.action = 'Test123';
+angular.module('taskManagerApp').controller('ModalInstanceCtrl', function ($rootScope, $scope, $http, $uibModalInstance, items) {
+  var modal = this;
+  $scope.taskName = items.taskName;
+  $scope.taskDesc = items.taskDesc;
+  $scope.taskStatus = items.taskStatus;
+  $scope.taskPriority = items.taskPriority;
+  $scope.taskUri = items.taskUri;
+  $scope.statuses=['ACTIVE','COMPLETED'];
+  $scope.priorities=['HIGH','MEDIUM','LOW'];
 
   $scope.ok = function () {
+    $http.patch($scope.taskUri, { taskName:$scope.taskName, taskDescription:$scope.taskDesc, taskStatus:$scope.taskStatus, $taskPriority:$scope.taskPriority });
+    $rootScope.$broadcast('findTasks');
+    items.Notification.success("Task Updated!"); 
     $uibModalInstance.close(1);
   };
 
@@ -49,17 +57,24 @@ angular.module('taskManagerApp').controller('ModalInstanceCtrl', function ($scop
   };
 });
 
-angular.module('taskManagerApp').controller('taskManagerController', function ($scope,$http, Notification,$uibModal, $log) {
+angular.module('taskManagerApp').controller('taskManagerController', function ($rootScope, $scope, $timeout, $http, Notification, $uibModal, $log) {
   
   var urlBase="";
   $scope.toggle=true;
-    $scope.success=false;
+  $scope.success=false;
   $scope.selection = [];
   $scope.statuses=['ACTIVE','COMPLETED'];
   $scope.priorities=['HIGH','MEDIUM','LOW'];
   $http.defaults.headers.post["Content-Type"] = "application/json";
 
-
+  
+  $scope.$on('findTasks', function() {
+        $timeout(function() {
+          $scope.$apply(function() {
+            findAllTasks();
+          })
+        }, 500);
+  });
 
     function findAllTasks() {
         //get all tasks and display initially
@@ -103,7 +118,7 @@ angular.module('taskManagerApp').controller('taskManagerController', function ($
              console.log("Might be good to GET " + newTaskUri + " and append the task.");
              // Refetching EVERYTHING every time can get expensive over time
              // Better solution would be to $http.get(headers()["location"]) and add it to the list
-             findAllTasks();
+             $rootScope.$broadcast('findTasks');
         });
     }
   };
@@ -145,25 +160,28 @@ angular.module('taskManagerApp').controller('taskManagerController', function ($
           });
           Notification.success('Archived all completed tasks!')
           console.log("It's risky to run this without confirming all the patches are done. when.js is great for that");
-          findAllTasks();
+          $rootScope.$broadcast('findTasks');
     };
 
-
-  $scope.items = ['item1', 'item2', 'item3'];
-
-  $scope.animationsEnabled = true;
-
-  $scope.open = function (taskName) {
+  $scope.open = function (taskUri, taskName, taskDesc, taskStatus, taskPriority) {
 
     var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
+      animation: true,
       templateUrl: 'myModalContent.html',
       controller: 'ModalInstanceCtrl',
-      
+      controllerAs: 'modal',
       resolve: {
-        taskName: function () {
-          return taskName;
+        items: function () {
+          return {
+            taskUri: taskUri,
+            taskName: taskName,
+            taskDesc: taskDesc,
+            taskStatus: taskStatus,
+            taskPriority: taskPriority,
+            Notification: Notification
+          };
         }
+
       }
     });
 
@@ -173,11 +191,6 @@ angular.module('taskManagerApp').controller('taskManagerController', function ($
       $log.info('Modal dismissed at: ' + new Date());
     });
   };
-
-  $scope.toggleAnimation = function () {
-    $scope.animationsEnabled = !$scope.animationsEnabled;
-  };
-  
 });
 
 //Angularjs Directive for confirm dialog box
